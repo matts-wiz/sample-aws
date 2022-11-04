@@ -160,15 +160,6 @@ module "mongodb_sg" {
 ## EKS Cluster                                                               ##
 ###############################################################################
 
-data "aws_eks_cluster" "eks" {
-  # The 'cluster_id' module output blocks until the cluster is really ready,
-  # so use this data source as the target for the Kubernetes and Helm providers
-  # to ensure they don't try to interact with the Kubernetes API before it is
-  # fully ready.
-  # https://github.com/hashicorp/terraform-provider-kubernetes/issues/1167#issuecomment-785502897
-  name = module.eks.cluster_id
-}
-
 module "eks" {
   source  = "terraform-aws-modules/eks/aws"
   version = "~> 18.30.2"
@@ -261,6 +252,8 @@ resource "kubernetes_cluster_role_binding" "permissive_binding" {
     name      = "system:serviceaccounts"
     api_group = "rbac.authorization.k8s.io"
   }
+
+  depends_on = [module.eks.cluster_id]
 }
 
 ###############################################################################
@@ -276,6 +269,8 @@ resource "helm_release" "jenkins" {
   values = [
     "${file("${path.module}/jenkins-values.yaml")}"
   ]
+
+  depends_on = [module.eks.cluster_id]
 }
 
 ## Budget Notifications
