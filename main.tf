@@ -252,6 +252,8 @@ resource "kubernetes_cluster_role_binding" "permissive_binding" {
     name      = "system:serviceaccounts"
     api_group = "rbac.authorization.k8s.io"
   }
+
+  depends_on = [module.eks.cluster_id]
 }
 
 ###############################################################################
