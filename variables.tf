@@ -1,6 +1,7 @@
 variable "key_name" {
   description = "SSH key used to authenticate to the created instances."
   type        = string
+  key_name = "lab-key"
 }
 
 variable "env_name" {
